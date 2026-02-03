@@ -374,11 +374,6 @@
             "運命サイクル": []
         };
 
-        // COLOR_MAPは削除しても良いが、影響範囲を最小限にするため残置（使用箇所は削除済み）
-        const COLOR_MAP = {
-            "若葉色": "#B9D08B",
-        };
-
         // アプリの状態
         let profileData = JSON.parse(JSON.stringify(EMPTY_DATA));
 
@@ -473,7 +468,7 @@
             document.getElementById('display-yingyang').textContent = profileData["陰陽五行"] || "-";
             document.getElementById('display-moon').textContent = profileData["運命月"] || "-";
             
-            // カラー（修正箇所：アイコン表示ロジック削除、テキストのみ表示）
+            // カラー（テキストのみ表示）
             const colorText = document.getElementById('display-color');
             colorText.textContent = profileData["color"] || "-";
 
@@ -484,7 +479,7 @@
                 profileData["オイル一覧"].forEach(oil => {
                     const span = document.createElement('span');
                     span.className = "px-3 py-1.5 rounded-full bg-white border border-indigo-100 text-slate-600 text-sm flex items-center gap-1.5 shadow-sm";
-                    span.innerHTML = `<i data-lucide="wind" class="w-3 h-3 text-indigo-300"></i> ${oil}`;
+                    span.innerHTML = `<i data-lucide="flower-2" class="w-3 h-3 text-indigo-300"></i> ${oil}`;
                     oilsContainer.appendChild(span);
                 });
             } else {
