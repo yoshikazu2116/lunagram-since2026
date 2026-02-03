@@ -1,603 +1,631 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>心理心月鑑定 - LUNAGRAM</title>
-  <style>
-    :root{
-      --bg:#fbfaf6;
-      --ink:#1b1f2a;
-      --muted:#6b7280;
-      --card:#ffffffcc;
-      --line:#e7e4dc;
-      --shadow:0 10px 30px rgba(0,0,0,.06);
-      --radius:18px;
-      --accent:#7c83ff;
-    }
-    html,body{height:100%;}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
-      color:var(--ink);
-      background:
-        radial-gradient(1000px 700px at 70% 20%, rgba(124,131,255,.18), transparent 60%),
-        radial-gradient(900px 600px at 20% 80%, rgba(255,199,102,.16), transparent 60%),
-        linear-gradient(180deg, #fffdf6, #fbfaf6);
-      overflow-x:hidden;
-    }
-    .noise{
-      position:fixed; inset:0;
-      pointer-events:none;
-      background-image:
-        radial-gradient(circle at 20% 30%, rgba(0,0,0,.05) 1px, transparent 1px),
-        radial-gradient(circle at 70% 60%, rgba(0,0,0,.04) 1px, transparent 1px),
-        radial-gradient(circle at 40% 80%, rgba(0,0,0,.03) 1px, transparent 1px);
-      background-size: 140px 140px, 180px 180px, 220px 220px;
-      opacity:.35;
-      mix-blend-mode:multiply;
-    }
-    .wrap{max-width:1100px; margin:0 auto; padding:28px 18px 60px;}
-    .top{
-      display:flex; align-items:center; justify-content:center; gap:10px;
-      margin-top:14px;
-    }
-    .moon{
-      width:28px; height:28px; display:inline-block;
-      background: radial-gradient(circle at 35% 40%, #ffffff, #cfd4ff);
-      border-radius:999px;
-      box-shadow: inset -6px 0 0 rgba(124,131,255,.35);
-    }
-    .brand{
-      text-align:center;
-      line-height:1.05;
-    }
-    .brand h1{margin:0; font-size:28px; font-weight:800; letter-spacing:.08em;}
-    .brand .sub{margin-top:6px; font-size:12px; letter-spacing:.28em; color:var(--accent); font-weight:800;}
-    .namePill{
-      margin:18px auto 22px;
-      width:fit-content;
-      padding:10px 22px;
-      background:rgba(255,255,255,.75);
-      border:1px solid var(--line);
-      border-radius:999px;
-      box-shadow: var(--shadow);
-      font-weight:700;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns: 360px 1fr;
-      gap:18px;
-      align-items:start;
-    }
-    @media (max-width: 980px){
-      .grid{grid-template-columns:1fr;}
-    }
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      backdrop-filter: blur(10px);
-    }
-    .cardPad{padding:16px 16px;}
-    .row{display:flex; align-items:center; justify-content:space-between; gap:14px;}
-    .label{font-size:12px; letter-spacing:.06em; color:var(--muted); font-weight:800;}
-    .value{font-size:14px; font-weight:700;}
-    .bigValue{font-size:18px; font-weight:900;}
-    .sectionTitle{
-      display:flex; align-items:center; gap:10px;
-      font-weight:900; font-size:14px;
-      margin-bottom:10px;
-    }
-    .icon{
-      width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center;
-      color:var(--accent);
-    }
-    .divider{height:1px; background:var(--line); margin:12px 0;}
-    .kv{
-      display:grid;
-      grid-template-columns: 1fr auto;
-      row-gap:10px;
-      column-gap:14px;
-      align-items:center;
-      padding:8px 2px;
-    }
-    .chip{
-      font-size:12px;
-      padding:3px 8px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      background:rgba(255,255,255,.75);
-      color:var(--muted);
-      font-weight:800;
-    }
-    .list{
-      margin:0; padding:0; list-style:none;
-    }
-    .list li{
-      padding:9px 10px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:rgba(255,255,255,.65);
-      display:flex; align-items:center; justify-content:space-between;
-      margin-bottom:8px;
-      gap:12px;
-    }
-    .list li:last-child{margin-bottom:0;}
-    .cycleYear{font-weight:900;}
-    .cycleText{font-weight:700; color:var(--muted);}
-    .star{
-      font-size:12px; font-weight:900; color:#d97706;
-      padding:3px 10px; border-radius:999px;
-      border:1px solid rgba(217,119,6,.3);
-      background: rgba(255,237,213,.75);
-      white-space:nowrap;
-    }
-    .empty{
-      padding:36px 16px;
-      text-align:center;
-      color:var(--muted);
-      font-weight:700;
-    }
-    .emptyIcon{
-      width:44px; height:44px; margin:0 auto 10px;
-      border-radius:14px;
-      border:1px dashed var(--line);
-      display:flex; align-items:center; justify-content:center;
-      color:var(--muted);
-      background:rgba(255,255,255,.55);
-    }
-    .controls{
-      margin-top:16px;
-      display:flex; flex-wrap:wrap; gap:10px;
-      align-items:center;
-      justify-content:center;
-    }
-    button{
-      appearance:none; border:1px solid var(--line);
-      background:rgba(255,255,255,.78);
-      color:var(--ink);
-      border-radius:12px;
-      padding:9px 12px;
-      font-weight:800;
-      cursor:pointer;
-      box-shadow: 0 8px 18px rgba(0,0,0,.04);
-      transition: transform .08s ease, background .15s ease;
-    }
-    button:hover{transform: translateY(-1px);}
-    button.primary{
-      border-color: rgba(124,131,255,.35);
-      background: rgba(124,131,255,.12);
-      color:#2a2e66;
-    }
-    button.danger{
-      border-color: rgba(239,68,68,.28);
-      background: rgba(239,68,68,.10);
-      color:#7a1b1b;
-    }
-    .hint{
-      margin-top:10px;
-      font-size:12px;
-      color:var(--muted);
-      text-align:center;
-      font-weight:700;
-    }
-    .overlay{
-      position:fixed; inset:0;
-      background: rgba(10,12,18,.35);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      z-index:50;
-    }
-    .modal{
-      width:min(860px, 100%);
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 25px 70px rgba(0,0,0,.22);
-      border: 1px solid rgba(0,0,0,.08);
-      overflow:hidden;
-    }
-    .modalHead{
-      padding:12px 14px;
-      display:flex; align-items:center; justify-content:space-between;
-      background: linear-gradient(180deg, #fff, #fbfaf6);
-      border-bottom: 1px solid var(--line);
-    }
-    .modalHead .title{font-weight:900;}
-    .modalBody{padding:12px 14px;}
-    textarea{
-      width:100%;
-      min-height:260px;
-      resize:vertical;
-      border-radius:14px;
-      border:1px solid var(--line);
-      padding:12px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size:12px;
-      line-height:1.55;
-      outline:none;
-    }
-    .err{
-      margin-top:10px;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(239,68,68,.28);
-      background: rgba(239,68,68,.08);
-      color:#7a1b1b;
-      font-weight:800;
-      display:none;
-    }
-    .foot{
-      margin-top:28px;
-      text-align:center;
-      color:rgba(107,114,128,.75);
-      font-size:12px;
-      font-weight:700;
-      letter-spacing:.08em;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心理心月鑑定 - LUNAGRAM -</title>
+    
+    <!-- Tailwind CSS (デザイン用) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts (美しい日本語フォント) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons (アイコン用) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Shippori Mincho', serif; /* フォント設定 */
+        }
+        .font-sans {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        /* グラスモーフィズムの基本スタイル */
+        .glass-card {
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            background-color: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+        }
+        .glass-card:hover {
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+        /* ハイライトカード */
+        .highlight-card {
+            background-image: linear-gradient(to bottom right, rgba(255, 251, 235, 0.8), rgba(238, 242, 255, 0.8));
+            border-color: rgba(253, 230, 138, 0.6);
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+        }
+        /* アニメーション */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        /* スクロールバーのカスタマイズ */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
 </head>
-<body>
-  <div class="noise"></div>
-  <div class="wrap">
-    <div class="top">
-      <span class="moon" aria-hidden="true"></span>
-      <div class="brand">
-        <h1>心理心月鑑定</h1>
-        <div class="sub">LUNAGRAM</div>
-      </div>
+<body class="min-h-screen bg-[#FDFBF7] text-slate-700 selection:bg-indigo-100 relative overflow-x-hidden">
+
+    <!-- 背景：月の光と雲 -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <!-- 大きな月 -->
+        <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-gradient-to-b from-indigo-100/40 to-transparent blur-3xl"></div>
+        <div class="absolute top-[10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-r from-amber-50/50 to-transparent blur-3xl"></div>
+        <!-- 星屑のテクスチャ (CSSでパターン再現) -->
+        <div class="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] mix-blend-multiply"></div>
     </div>
 
-    <div id="namePill" class="namePill">No Name</div>
+    <!-- 編集ボタン -->
+    <button onclick="openModal()" class="fixed top-6 right-6 z-40 px-5 py-3 rounded-full bg-white/90 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.1)] border border-indigo-100 hover:scale-105 transition-all text-indigo-900 font-medium flex items-center gap-2 group hover:shadow-indigo-200/50 cursor-pointer">
+        <div class="bg-indigo-100 p-1.5 rounded-full group-hover:bg-indigo-200 transition-colors">
+            <i data-lucide="edit-3" class="w-4 h-4 text-indigo-600"></i>
+        </div>
+        <span>データを入力</span>
+    </button>
 
-    <div class="grid">
-      <div class="leftCol">
-        <div class="card cardPad" style="margin-bottom:18px;">
-          <div class="sectionTitle">
-            <span class="icon" aria-hidden="true">✦</span>
-            <span>SOUL BASE</span>
-          </div>
-          <div class="row">
-            <div class="value" id="soulBase">ー</div>
-            <div class="chip">魂の基盤</div>
-          </div>
+    <!-- メインコンテンツ -->
+    <div id="main-content" class="relative z-10 max-w-5xl mx-auto p-4 md:p-8 transition-all duration-1000 opacity-0 translate-y-4">
+        
+        <!-- ヘッダー -->
+        <header class="text-center mb-12 pt-8 relative">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-10 w-32 h-32 bg-yellow-100 rounded-full blur-[60px] opacity-60 pointer-events-none"></div>
+            
+            <div class="inline-block relative animate-float">
+                <div class="absolute inset-0 bg-yellow-200 rounded-full blur-xl opacity-20 animate-pulse"></div>
+                <i data-lucide="moon" class="w-12 h-12 text-slate-300 relative z-10 mb-4 mx-auto drop-shadow-lg fill-[#f1f5f9]" stroke-width="1"></i>
+            </div>
+
+            <!-- アプリタイトル -->
+            <div class="mb-8">
+                <h1 class="text-2xl md:text-3xl font-bold text-indigo-950 tracking-widest mb-2">
+                    心理心月鑑定
+                </h1>
+                <div class="text-sm md:text-base font-light text-indigo-400 tracking-[0.3em] uppercase font-sans">
+                    ー LUNAGRAM ー
+                </div>
+            </div>
+
+            <!-- 名前 -->
+            <div class="inline-block px-8 py-3 bg-white/40 backdrop-blur-sm rounded-full border border-white/60 shadow-sm mb-2 min-w-[200px] min-h-[60px] flex items-center justify-center">
+                <h2 id="display-name" class="text-2xl md:text-3xl font-bold text-slate-700 tracking-tight">
+                    <!-- JSで挿入 -->
+                </h2>
+            </div>
+
+            <div id="display-dob-container" class="flex items-center justify-center gap-3 text-slate-500 font-light tracking-widest text-sm md:text-base mt-4 min-h-[24px]">
+                <!-- JSで挿入 -->
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          
+            <!-- 左カラム：基本ステータス -->
+            <div class="md:col-span-4 space-y-6">
+                <!-- ソウルベース -->
+                <div class="glass-card rounded-2xl p-6 text-center relative overflow-hidden group min-h-[140px] transition-all duration-300">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-300 via-purple-300 to-amber-300"></div>
+                    <div class="text-xs text-indigo-400 uppercase tracking-widest mb-1 mt-2 font-sans">Soul Base</div>
+                    <div id="display-soulbase" class="text-4xl text-slate-700 mb-2 font-bold">
+                        <!-- JSで挿入 -->
+                    </div>
+                    <div class="text-xs text-slate-400 font-light">魂の基盤</div>
+                </div>
+
+                <!-- 命式・属性 -->
+                <div class="glass-card rounded-2xl p-6 transition-all duration-300">
+                    <div class="flex items-center gap-2 mb-4 text-slate-600 border-b border-slate-200/50 pb-2">
+                        <i data-lucide="star" class="w-5 h-5 text-indigo-400"></i>
+                        <h3 class="text-lg tracking-wider font-semibold">命式・属性</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <span class="text-slate-400 text-sm font-light">運命数</span>
+                            <span id="display-number" class="text-xl font-bold text-indigo-900"></span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <span class="text-slate-400 text-sm font-light">陰陽五行</span>
+                            <span id="display-yingyang" class="text-lg text-slate-700"></span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <span class="text-slate-400 text-sm font-light">運命月</span>
+                            <span class="flex items-center gap-2 text-lg text-slate-700">
+                                <i data-lucide="moon" class="w-4 h-4 text-amber-400 fill-amber-100"></i>
+                                <span id="display-moon"></span>
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center pt-1">
+                            <span class="text-slate-400 text-sm font-light">ラッキーカラー</span>
+                            <div class="flex items-center gap-2">
+                                <span id="display-color-dot" class="w-5 h-5 rounded-full shadow-sm border border-slate-100 hidden"></span>
+                                <span id="display-color" class="text-slate-700"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- オイル -->
+                <div class="glass-card rounded-2xl p-6 transition-all duration-300">
+                    <div class="flex items-center gap-2 mb-4 text-slate-600 border-b border-slate-200/50 pb-2">
+                        <i data-lucide="droplet" class="w-5 h-5 text-indigo-400"></i>
+                        <h3 class="text-lg tracking-wider font-semibold">オイル</h3>
+                    </div>
+                    <div id="display-oils" class="flex flex-wrap gap-2">
+                        <!-- JSで挿入 -->
+                    </div>
+                </div>
+
+                <!-- 教科書ページ -->
+                <div class="glass-card rounded-2xl p-6 transition-all duration-300">
+                    <div class="flex items-center gap-2 mb-4 text-slate-600 border-b border-slate-200/50 pb-2">
+                        <i data-lucide="book-open" class="w-5 h-5 text-indigo-400"></i>
+                        <h3 class="text-lg tracking-wider font-semibold">教科書ページ</h3>
+                    </div>
+                    <div class="space-y-4 text-sm">
+                        <div class="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                            <div class="p-1.5 bg-indigo-50 rounded-full text-indigo-400">
+                                <i data-lucide="info" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-slate-400 text-xs mb-0.5">宿命月ページ</div>
+                                <div id="display-moon-page" class="font-medium text-slate-700"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                            <div class="p-1.5 bg-indigo-50 rounded-full text-indigo-400">
+                                <i data-lucide="info" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-slate-400 text-xs mb-0.5">宿命数ページ</div>
+                                <div id="display-number-page" class="font-medium text-slate-700"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右カラム：運命サイクル -->
+            <div class="md:col-span-8">
+                <div class="glass-card rounded-2xl p-6 h-full transition-all duration-300">
+                    <div class="flex items-center gap-2 mb-4 text-slate-600 border-b border-slate-200/50 pb-2">
+                        <i data-lucide="calendar" class="w-5 h-5 text-indigo-400"></i>
+                        <h3 class="text-lg tracking-wider font-semibold">12年運命サイクル</h3>
+                    </div>
+                    <div id="display-cycle" class="mt-6 space-y-2">
+                        <!-- JSで挿入 -->
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="card cardPad" style="margin-bottom:18px;">
-          <div class="sectionTitle">
-            <span class="icon" aria-hidden="true">☆</span>
-            <span>命式・属性</span>
-          </div>
-          <div class="divider"></div>
-          <div class="kv">
-            <div class="label">運命数</div><div class="bigValue" id="fateNumber">ー</div>
-            <div class="label">陰陽五行</div><div class="value" id="yinYang">ー</div>
-            <div class="label">運命月</div><div class="value" id="fateMonth">ー</div>
-            <div class="label">ラッキーカラー</div><div class="value" id="color">ー</div>
-          </div>
-        </div>
-
-        <div class="card cardPad" style="margin-bottom:18px;">
-          <div class="sectionTitle">
-            <span class="icon" aria-hidden="true">💧</span>
-            <span>オイル</span>
-          </div>
-          <div class="divider"></div>
-          <ul id="oilList" class="list"></ul>
-          <div id="oilEmpty" class="empty" style="display:none;">ー</div>
-        </div>
-
-        <div class="card cardPad">
-          <div class="sectionTitle">
-            <span class="icon" aria-hidden="true">📘</span>
-            <span>教科書ページ</span>
-          </div>
-          <div class="divider"></div>
-          <div class="kv">
-            <div class="label">宿命月ページ</div><div class="value" id="destinyMonthPage">ー</div>
-            <div class="label">宿命数ページ</div><div class="value" id="destinyNumberPage">ー</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="rightCol">
-        <div class="card cardPad">
-          <div class="sectionTitle">
-            <span class="icon" aria-hidden="true">🗓</span>
-            <span>12年運命サイクル</span>
-          </div>
-          <div class="divider"></div>
-          <div id="cycleEmpty" class="empty">
-            <div class="emptyIcon" aria-hidden="true">📅</div>
-            データがありません
-          </div>
-          <ul id="cycleList" class="list" style="display:none;"></ul>
-        </div>
-
-        <div class="controls">
-          <button class="primary" id="btnEdit">データを入力</button>
-          <button id="btnSample">サンプル</button>
-          <button id="btnReset">初期化</button>
-          <button class="danger" id="btnClear">全消去</button>
-        </div>
-        <div class="hint">ここにデータを貼り付けてください。</div>
-      </div>
+        <footer class="mt-16 pb-8 text-center text-slate-400 text-xs flex flex-col items-center gap-2">
+           <div class="w-8 h-[1px] bg-slate-300"></div>
+           <p class="font-serif tracking-widest opacity-70">Spiritual Journey Map</p>
+        </footer>
     </div>
 
-    <div class="foot">Spiritual Journey Map</div>
-  </div>
+    <!-- 編集モーダル -->
+    <div id="edit-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] scale-95 transition-all duration-300" id="modal-panel">
+            <!-- モーダルヘッダー -->
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 flex-wrap gap-2">
+                <h3 class="font-bold text-slate-700 flex items-center gap-2 mr-auto">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i> データ編集
+                </h3>
+                
+                <div class="flex gap-2 items-center">
+                    <!-- アクションボタン群 -->
+                    <div id="action-buttons" class="flex gap-2 mr-2">
+                        <button onclick="confirmAction('clear')" class="p-2 text-xs text-slate-400 hover:text-red-500 flex items-center gap-1 transition-colors group rounded hover:bg-red-50" title="内容を空にする">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i> <span class="hidden sm:inline">クリア</span>
+                        </button>
+                        <button onclick="confirmAction('sample')" class="p-2 text-xs text-slate-400 hover:text-indigo-500 flex items-center gap-1 transition-colors group rounded hover:bg-indigo-50" title="サンプル読込">
+                            <i data-lucide="file-text" class="w-4 h-4"></i> <span class="hidden sm:inline">サンプル</span>
+                        </button>
+                        <button onclick="confirmAction('reset')" class="p-2 text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1 transition-colors group rounded hover:bg-slate-100" title="初期化">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4 group-hover:-rotate-180 transition-transform duration-500"></i> <span class="hidden sm:inline">リセット</span>
+                        </button>
+                    </div>
 
-  <div id="overlay" class="overlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="データ編集">
-      <div class="modalHead">
-        <div class="title">データ編集</div>
-        <div class="row" style="gap:8px;">
-          <button id="btnSave" class="primary">保存</button>
-          <button id="btnClose">閉じる</button>
+                    <!-- 確認ボタンエリア（動的に表示） -->
+                    <div id="confirm-area" class="hidden items-center gap-2 px-3 py-1 rounded-full animate-pulse border mr-2">
+                        <span id="confirm-text" class="text-xs font-medium whitespace-nowrap"></span>
+                        <button id="confirm-yes" class="px-2 py-0.5 text-white text-xs rounded transition-colors">はい</button>
+                        <button onclick="cancelConfirm()" class="px-2 py-0.5 text-slate-500 text-xs hover:bg-slate-200 rounded transition-colors">いいえ</button>
+                    </div>
+
+                    <div class="h-4 w-[1px] bg-slate-200 mx-1"></div>
+
+                    <button onclick="closeModal()" class="p-2 hover:bg-slate-200 rounded-full transition-colors cursor-pointer">
+                        <i data-lucide="x" class="w-5 h-5 text-slate-500"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- モーダルボディ -->
+            <div class="p-4 flex-1 overflow-auto bg-slate-50 relative">
+                <p class="text-xs text-slate-500 mb-2">
+                    ここにデータを貼り付けてください。
+                </p>
+                <textarea 
+                    id="json-input"
+                    class="w-full h-96 font-mono text-sm p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 outline-none shadow-inner bg-white text-slate-700 leading-relaxed resize-none"
+                    placeholder="{ ... データを貼り付け ... }"
+                ></textarea>
+                <div id="error-msg" class="hidden mt-2 text-red-500 text-sm flex items-center gap-2 bg-red-50 p-2 rounded">
+                    <i data-lucide="info" class="w-4 h-4"></i> <span id="error-text"></span>
+                </div>
+            </div>
+
+            <!-- モーダル・フッター -->
+            <div class="p-4 border-t border-slate-100 bg-white flex justify-end gap-3">
+                <button 
+                    onclick="closeModal()"
+                    class="px-4 py-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                    キャンセル
+                </button>
+                <button 
+                    onclick="saveData()"
+                    class="px-6 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                    <i data-lucide="save" class="w-4 h-4"></i> 保存して反映
+                </button>
+            </div>
         </div>
-      </div>
-      <div class="modalBody">
-        <textarea id="editor" spellcheck="false" placeholder='ここにJSONを貼り付けてください'></textarea>
-        <div id="errBox" class="err"></div>
-      </div>
     </div>
-  </div>
 
-  <script>
-    const STORAGE_KEY = "lunagram_profile_v1";
+    <!-- JavaScript ロジック -->
+    <script>
+        // 定数定義
+        const SAMPLE_DATA = {
+            "名前": "テスト四郎",
+            "生年月日": "2018年2月8日（平成30年）",
+            "ソウルベース": "A(アマテラス)",
+            "運命数": "08＋",
+            "宿命月": "老月",
+            "宿命月ページ": "初級編132ページ",
+            "宿命数ページ": "初級編136ページ",
+            "運命月": "満月",
+            "color": "若葉色",
+            "陰陽五行": "金－",
+            "オイル一覧": ["ティートリー", "ユーカリ", "サイプレス"],
+            "運命サイクル": [
+                "2017年【下弦＜忍耐＞】急変",
+                "2018年【下弦＜忍耐＞】耐える",
+                "2019年【下弦＜忍耐＞】清算",
+                "2020年【新月＜努力＞】スタート",
+                "2021年【新月＜努力＞】努力",
+                "2022年【新月＜努力＞】決定",
+                "2023年【上弦＜波乱＞】誘惑",
+                "2024年【上弦＜波乱＞】希望",
+                "2025年【上弦＜波乱＞】油断",
+                "2026年【満月＜実り＞】ご縁（★現在地）",
+                "2027年【満月＜実り＞】お金・力",
+                "2028年【満月＜実り＞】動揺"
+            ]
+        };
 
-    const SAMPLE_DATA = {
-      "名前":"テスト四郎",
-      "生年月日":"2018年2月8日（平成30年）",
-      "ソウルベース":"A(アマテラス)",
-      "運命数":"08＋",
-      "宿命月":"老月",
-      "宿命月ページ":"初級編132ページ",
-      "宿命数ページ":"初級編136ページ",
-      "運命月":"満月",
-      "color":"若葉色",
-      "陰陽五行":"金－",
-      "オイル一覧":["ティートリー","ユーカリ","サイプレス"],
-      "運命サイクル":[
-        "2017年【下弦＜忍耐＞】急変",
-        "2018年【下弦＜忍耐＞】耐える",
-        "2019年【下弦＜忍耐＞】清算",
-        "2020年【新月＜努力＞】スタート",
-        "2021年【新月＜努力＞】努力",
-        "2022年【新月＜努力＞】決定",
-        "2023年【上弦＜波乱＞】誘惑",
-        "2024年【上弦＜波乱＞】希望",
-        "2025年【上弦＜波乱＞】油断",
-        "2026年【満月＜実り＞】ご縁（★現在地）",
-        "2027年【満月＜実り＞】お金・力",
-        "2028年【満月＜実り＞】動揺"
-      ]
-    };
+        const EMPTY_DATA = {
+            "名前": "",
+            "生年月日": "",
+            "ソウルベース": "",
+            "運命数": "",
+            "宿命月": "",
+            "宿命月ページ": "",
+            "宿命数ページ": "",
+            "運命月": "",
+            "color": "",
+            "陰陽五行": "",
+            "オイル一覧": [],
+            "運命サイクル": []
+        };
 
-    const EMPTY_DATA = {
-      "名前":"",
-      "生年月日":"",
-      "ソウルベース":"",
-      "運命数":"",
-      "宿命月":"",
-      "宿命月ページ":"",
-      "宿命数ページ":"",
-      "運命月":"",
-      "color":"",
-      "陰陽五行":"",
-      "オイル一覧":[],
-      "運命サイクル":[]
-    };
+        const COLOR_MAP = {
+            "若葉色": "#B9D08B",
+        };
 
-    function safeString(v){
-      if (typeof v === "string") return v;
-      if (v === null || v === undefined) return "";
-      return String(v);
-    }
+        // アプリの状態
+        let profileData = JSON.parse(JSON.stringify(EMPTY_DATA));
 
-    function parseCycleItem(itemStr){
-      const s = safeString(itemStr);
-      const isCurrent = s.includes("★");
-      const yearMatch = s.match(/^(\d{4})年/);
-      const year = yearMatch ? yearMatch[1] : "";
-      const rest = yearMatch ? s.slice(yearMatch[0].length) : s;
-      return { year, text: rest.trim(), isCurrent };
-    }
+        // 初期化処理
+        document.addEventListener('DOMContentLoaded', () => {
+            // アニメーション用：少し遅れて表示
+            setTimeout(() => {
+                const main = document.getElementById('main-content');
+                main.classList.remove('opacity-0', 'translate-y-4');
+                main.classList.add('opacity-100', 'translate-y-0');
+            }, 100);
 
-    function validateProfile(obj){
-      const requiredKeys = ["名前","生年月日","ソウルベース","運命数","宿命月","宿命月ページ","宿命数ページ","運命月","color","陰陽五行","オイル一覧","運命サイクル"];
-      for (const k of requiredKeys){
-        if (!(k in obj)) return `キー「${k}」がありません。`;
-      }
-      if (!safeString(obj["生年月日"]).includes("（") || !safeString(obj["生年月日"]).includes("）")){
-        return "生年月日が和暦込みの形式ではありません。例 1982年1月1日（昭和57年）";
-      }
-      if (!Array.isArray(obj["オイル一覧"]) || obj["オイル一覧"].length < 1){
-        return "オイル一覧が空です。";
-      }
-      const banned = ["不明","不詳","なし","未取得","抽出不可","ソース","存在しない"];
-      for (const it of obj["オイル一覧"]){
-        const s = safeString(it);
-        for (const b of banned){
-          if (s.includes(b)) return "オイル一覧に代替語が含まれています。";
+            // 初期レンダリング
+            renderApp();
+            
+            // アイコン初期化
+            lucide.createIcons();
+        });
+
+        // データ解析ヘルパー
+        function parseCycleItem(itemStr) {
+            if (!itemStr) return { year: "", phase: "", keyword: "", isCurrent: false };
+            
+            const isCurrent = itemStr.includes("★");
+            const yearMatch = itemStr.match(/^(\d+年)/);
+            const phaseMatch = itemStr.match(/【(.*?)】/);
+            const keywordPart = itemStr.split(/】/)[1] || "";
+            
+            const year = yearMatch ? yearMatch[1] : "";
+            const phase = phaseMatch ? phaseMatch[1] : "";
+            let keyword = keywordPart.replace(/（★.*?）/, "").trim();
+            
+            return { year, phase, keyword, isCurrent };
         }
-      }
-      if (!Array.isArray(obj["運命サイクル"]) || obj["運命サイクル"].length !== 12){
-        return "運命サイクルは12件である必要があります。";
-      }
-      let starCount = 0;
-      for (const it of obj["運命サイクル"]){
-        if (safeString(it).includes("★")) starCount++;
-      }
-      if (starCount !== 1){
-        return "運命サイクルの（★現在地）は1件だけ必要です。";
-      }
-      if (!obj["運命サイクル"].some(x => safeString(x).startsWith("2026年") && safeString(x).includes("★"))){
-        return "2026年の要素にだけ（★現在地）が必要です。";
-      }
-      return "";
-    }
 
-    function render(profile){
-      const name = safeString(profile["名前"]).trim() || "No Name";
-      document.getElementById("namePill").textContent = name;
+        // 画面描画関数
+        function renderApp() {
+            // 基本情報
+            document.getElementById('display-name').textContent = profileData["名前"] || "No Name";
+            
+            const dobContainer = document.getElementById('display-dob-container');
+            if (profileData["生年月日"]) {
+                dobContainer.innerHTML = `
+                    <span class="w-8 h-[1px] bg-slate-300"></span>
+                    <span>${profileData["生年月日"]} 生まれ</span>
+                    <span class="w-8 h-[1px] bg-slate-300"></span>
+                `;
+            } else {
+                dobContainer.innerHTML = '';
+            }
 
-      document.getElementById("soulBase").textContent = safeString(profile["ソウルベース"]) || "ー";
-      document.getElementById("fateNumber").textContent = safeString(profile["運命数"]) || "ー";
-      document.getElementById("yinYang").textContent = safeString(profile["陰陽五行"]) || "ー";
-      document.getElementById("fateMonth").textContent = safeString(profile["運命月"]) || "ー";
-      document.getElementById("color").textContent = safeString(profile["color"]) || "ー";
-      document.getElementById("destinyMonthPage").textContent = safeString(profile["宿命月ページ"]) || "ー";
-      document.getElementById("destinyNumberPage").textContent = safeString(profile["宿命数ページ"]) || "ー";
+            // ステータス
+            document.getElementById('display-soulbase').textContent = profileData["ソウルベース"] || "-";
+            document.getElementById('display-number').textContent = profileData["運命数"] || "-";
+            document.getElementById('display-yingyang').textContent = profileData["陰陽五行"] || "-";
+            document.getElementById('display-moon').textContent = profileData["運命月"] || "-";
+            
+            // カラー
+            const colorDot = document.getElementById('display-color-dot');
+            const colorText = document.getElementById('display-color');
+            colorText.textContent = profileData["color"] || "-";
+            if (profileData["color"] && COLOR_MAP[profileData["color"]]) {
+                colorDot.style.backgroundColor = COLOR_MAP[profileData["color"]];
+                colorDot.classList.remove('hidden');
+            } else if (profileData["color"]) {
+                // 定義されていない色の場合、デフォルトグレーなどにするか、あるいはそのまま表示
+                 colorDot.style.backgroundColor = '#e2e8f0';
+                 colorDot.classList.remove('hidden');
+            } else {
+                colorDot.classList.add('hidden');
+            }
 
-      const oils = Array.isArray(profile["オイル一覧"]) ? profile["オイル一覧"] : [];
-      const oilUl = document.getElementById("oilList");
-      const oilEmpty = document.getElementById("oilEmpty");
-      oilUl.innerHTML = "";
-      if (oils.length === 0){
-        oilEmpty.style.display = "block";
-      }else{
-        oilEmpty.style.display = "none";
-        for (const o of oils){
-          const li = document.createElement("li");
-          const left = document.createElement("div");
-          left.className = "value";
-          left.textContent = safeString(o);
-          li.appendChild(left);
-          oilUl.appendChild(li);
+            // オイル一覧
+            const oilsContainer = document.getElementById('display-oils');
+            oilsContainer.innerHTML = '';
+            if (profileData["オイル一覧"] && profileData["オイル一覧"].length > 0) {
+                profileData["オイル一覧"].forEach(oil => {
+                    const span = document.createElement('span');
+                    span.className = "px-3 py-1.5 rounded-full bg-white border border-indigo-100 text-slate-600 text-sm flex items-center gap-1.5 shadow-sm";
+                    span.innerHTML = `<i data-lucide="wind" class="w-3 h-3 text-indigo-300"></i> ${oil}`;
+                    oilsContainer.appendChild(span);
+                });
+            } else {
+                const span = document.createElement('span');
+                span.className = "text-slate-400 text-sm";
+                span.textContent = "-";
+                oilsContainer.appendChild(span);
+            }
+
+            // ページ番号
+            document.getElementById('display-moon-page').textContent = profileData["宿命月ページ"] || "-";
+            document.getElementById('display-number-page').textContent = profileData["宿命数ページ"] || "-";
+
+            // 運命サイクル
+            const cycleContainer = document.getElementById('display-cycle');
+            cycleContainer.innerHTML = '';
+            if (profileData["運命サイクル"] && profileData["運命サイクル"].length > 0) {
+                profileData["運命サイクル"].forEach(itemStr => {
+                    const { year, phase, keyword, isCurrent } = parseCycleItem(itemStr);
+                    
+                    const div = document.createElement('div');
+                    // スタイルクラスの構築
+                    let classes = "relative flex items-center p-4 rounded-xl transition-all duration-300 group ";
+                    if (isCurrent) {
+                        classes += "bg-gradient-to-r from-amber-50 to-indigo-50 border border-amber-200 shadow-md transform scale-[1.02] z-10 my-4 highlight-card";
+                    } else {
+                        classes += "bg-white/40 hover:bg-white/80 border border-transparent hover:border-indigo-100";
+                    }
+                    div.className = classes;
+
+                    // HTML構築
+                    let html = '';
+                    // 現在地バー
+                    if (isCurrent) {
+                        html += `<div class="absolute -left-1 top-1/2 -translate-y-1/2"><div class="w-1 h-12 bg-amber-300 rounded-r-full shadow-[0_0_8px_#fcd34d]"></div></div>`;
+                    }
+                    
+                    // 年
+                    const yearColor = isCurrent ? 'text-amber-600' : 'text-slate-400';
+                    html += `<div class="w-20 font-bold text-lg ${yearColor}">${year}</div>`;
+                    
+                    // フェーズとキーワード
+                    const phaseColor = isCurrent ? 'text-slate-700 font-semibold' : 'text-slate-500';
+                    const dotColor = isCurrent ? 'bg-amber-300' : 'bg-slate-300';
+                    const keyColor = isCurrent ? 'text-indigo-900 font-bold' : 'text-slate-700';
+                    
+                    html += `
+                        <div class="flex-1 flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
+                            <span class="text-sm md:text-base ${phaseColor}">${phase}</span>
+                            <div class="hidden md:block h-1 w-1 rounded-full ${dotColor}"></div>
+                            <span class="text-base md:text-lg tracking-wide ${keyColor}">${keyword}</span>
+                        </div>
+                    `;
+
+                    // 現在地バッジ
+                    if (isCurrent) {
+                        html += `
+                            <div class="hidden sm:flex items-center gap-1 px-3 py-1 rounded-full bg-white border border-amber-200 text-amber-600 text-xs font-bold shadow-sm">
+                                <i data-lucide="star" class="w-3 h-3 fill-amber-300 text-amber-400"></i>
+                                現在地
+                            </div>
+                        `;
+                    }
+                    
+                    div.innerHTML = html;
+                    cycleContainer.appendChild(div);
+                });
+            } else {
+                cycleContainer.innerHTML = `
+                    <div class="text-center py-12 text-slate-400">
+                        <i data-lucide="calendar" class="w-12 h-12 mx-auto mb-2 opacity-20"></i>
+                        データがありません
+                    </div>
+                `;
+            }
+
+            // DOM更新後にアイコンを再描画
+            lucide.createIcons();
         }
-      }
 
-      const cycles = Array.isArray(profile["運命サイクル"]) ? profile["運命サイクル"] : [];
-      const cycleUl = document.getElementById("cycleList");
-      const cycleEmpty = document.getElementById("cycleEmpty");
-      cycleUl.innerHTML = "";
-      if (cycles.length === 0){
-        cycleEmpty.style.display = "block";
-        cycleUl.style.display = "none";
-      }else{
-        cycleEmpty.style.display = "none";
-        cycleUl.style.display = "block";
-        for (const c of cycles){
-          const parsed = parseCycleItem(c);
-          const li = document.createElement("li");
+        /* --- モーダル・編集機能 --- */
 
-          const left = document.createElement("div");
-          left.style.display = "flex";
-          left.style.flexDirection = "column";
-          left.style.gap = "2px";
+        function openModal() {
+            const modal = document.getElementById('edit-modal');
+            const panel = document.getElementById('modal-panel');
+            const textarea = document.getElementById('json-input');
 
-          const y = document.createElement("div");
-          y.className = "cycleYear";
-          y.textContent = parsed.year ? `${parsed.year}年` : "";
-          const t = document.createElement("div");
-          t.className = "cycleText";
-          t.textContent = parsed.text;
+            // データのセット
+            if (JSON.stringify(profileData) === JSON.stringify(EMPTY_DATA)) {
+                textarea.value = "";
+            } else {
+                textarea.value = JSON.stringify(profileData, null, 2);
+            }
 
-          left.appendChild(y);
-          left.appendChild(t);
-          li.appendChild(left);
+            // エラー表示リセット
+            document.getElementById('error-msg').classList.add('hidden');
+            cancelConfirm(); // 確認モードリセット
 
-          if (parsed.isCurrent){
-            const badge = document.createElement("div");
-            badge.className = "star";
-            badge.textContent = "現在地";
-            li.appendChild(badge);
-          }
-          cycleUl.appendChild(li);
+            // モーダル表示
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            panel.classList.remove('scale-95');
+            panel.classList.add('scale-100');
         }
-      }
-    }
 
-    function loadInitial(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return JSON.parse(JSON.stringify(EMPTY_DATA));
-        const obj = JSON.parse(raw);
-        return { ...JSON.parse(JSON.stringify(EMPTY_DATA)), ...obj };
-      }catch(e){
-        return JSON.parse(JSON.stringify(EMPTY_DATA));
-      }
-    }
-
-    function openEditor(text){
-      document.getElementById("editor").value = text || "";
-      hideError();
-      const ov = document.getElementById("overlay");
-      ov.style.display = "flex";
-      ov.setAttribute("aria-hidden","false");
-    }
-
-    function closeEditor(){
-      const ov = document.getElementById("overlay");
-      ov.style.display = "none";
-      ov.setAttribute("aria-hidden","true");
-    }
-
-    function showError(msg){
-      const box = document.getElementById("errBox");
-      box.textContent = msg;
-      box.style.display = "block";
-    }
-    function hideError(){
-      const box = document.getElementById("errBox");
-      box.textContent = "";
-      box.style.display = "none";
-    }
-
-    let profile = loadInitial();
-    render(profile);
-
-    document.getElementById("btnEdit").addEventListener("click", () => {
-      openEditor(JSON.stringify(profile, null, 2));
-    });
-    document.getElementById("btnClose").addEventListener("click", () => closeEditor());
-
-    document.getElementById("btnSave").addEventListener("click", () => {
-      try{
-        const text = document.getElementById("editor").value.trim();
-        const obj = JSON.parse(text);
-        const err = validateProfile(obj);
-        if (err){
-          showError(err);
-          return;
+        function closeModal() {
+            const modal = document.getElementById('edit-modal');
+            const panel = document.getElementById('modal-panel');
+            
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            panel.classList.remove('scale-100');
+            panel.classList.add('scale-95');
         }
-        profile = obj;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-        render(profile);
-        closeEditor();
-      }catch(e){
-        showError("JSONの形式が正しくありません。カンマや括弧を確認してください。");
-      }
-    });
 
-    document.getElementById("btnSample").addEventListener("click", () => {
-      if (!confirm("サンプルデータを読み込みますか？")) return;
-      profile = JSON.parse(JSON.stringify(SAMPLE_DATA));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-      render(profile);
-    });
+        function saveData() {
+            const textarea = document.getElementById('json-input');
+            const value = textarea.value;
+            const errorArea = document.getElementById('error-msg');
+            const errorText = document.getElementById('error-text');
 
-    document.getElementById("btnReset").addEventListener("click", () => {
-      if (!confirm("初期状態に戻しますか？")) return;
-      profile = JSON.parse(JSON.stringify(EMPTY_DATA));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-      render(profile);
-    });
+            try {
+                if (!value.trim()) {
+                    // 空の場合はクリア
+                    profileData = JSON.parse(JSON.stringify(EMPTY_DATA));
+                } else {
+                    const parsed = JSON.parse(value);
+                    profileData = parsed;
+                }
+                
+                renderApp();
+                closeModal();
+            } catch (e) {
+                errorText.textContent = "データの形式が正しくありません。カンマや括弧を確認してください。";
+                errorArea.classList.remove('hidden');
+            }
+        }
 
-    document.getElementById("btnClear").addEventListener("click", () => {
-      if (!confirm("完全に消去しますか？")) return;
-      localStorage.removeItem(STORAGE_KEY);
-      profile = JSON.parse(JSON.stringify(EMPTY_DATA));
-      render(profile);
-    });
+        /* --- アクション確認ロジック --- */
+        
+        function confirmAction(actionType) {
+            const buttons = document.getElementById('action-buttons');
+            const confirmArea = document.getElementById('confirm-area');
+            const confirmText = document.getElementById('confirm-text');
+            const yesBtn = document.getElementById('confirm-yes');
+            
+            // UI切り替え
+            buttons.classList.add('hidden');
+            confirmArea.classList.remove('hidden');
+            confirmArea.classList.add('flex');
 
-    document.getElementById("overlay").addEventListener("click", (e) => {
-      if (e.target && e.target.id === "overlay") closeEditor();
-    });
-  </script>
+            // アクション設定
+            if (actionType === 'clear') {
+                confirmArea.className = "flex items-center gap-2 bg-red-50 px-3 py-1 rounded-full animate-in fade-in slide-in-from-right-2 border border-red-100 mr-2";
+                confirmText.className = "text-xs text-red-600 font-medium whitespace-nowrap";
+                confirmText.textContent = "全消去？";
+                yesBtn.className = "px-2 py-0.5 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors cursor-pointer";
+                yesBtn.onclick = () => executeClear();
+            } else if (actionType === 'sample') {
+                confirmArea.className = "flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full animate-in fade-in slide-in-from-right-2 border border-indigo-100 mr-2";
+                confirmText.className = "text-xs text-indigo-600 font-medium whitespace-nowrap";
+                confirmText.textContent = "サンプル読込？";
+                yesBtn.className = "px-2 py-0.5 bg-indigo-500 text-white text-xs rounded hover:bg-indigo-600 transition-colors cursor-pointer";
+                yesBtn.onclick = () => executeSample();
+            } else if (actionType === 'reset') {
+                confirmArea.className = "flex items-center gap-2 bg-slate-100 px-3 py-1 rounded-full animate-in fade-in slide-in-from-right-2 border border-slate-200 mr-2";
+                confirmText.className = "text-xs text-slate-600 font-medium whitespace-nowrap";
+                confirmText.textContent = "初期化？";
+                yesBtn.className = "px-2 py-0.5 bg-slate-500 text-white text-xs rounded hover:bg-slate-600 transition-colors cursor-pointer";
+                yesBtn.onclick = () => executeReset();
+            }
+        }
+
+        function cancelConfirm() {
+            document.getElementById('action-buttons').classList.remove('hidden');
+            document.getElementById('confirm-area').classList.add('hidden');
+            document.getElementById('confirm-area').classList.remove('flex');
+            document.getElementById('error-msg').classList.add('hidden');
+        }
+
+        function executeClear() {
+            document.getElementById('json-input').value = "";
+            
+            // 裏側のデータもクリア
+            profileData = JSON.parse(JSON.stringify(EMPTY_DATA));
+            renderApp();
+            
+            cancelConfirm();
+        }
+
+        function executeReset() {
+            document.getElementById('json-input').value = "";
+            profileData = JSON.parse(JSON.stringify(EMPTY_DATA));
+            renderApp();
+            cancelConfirm();
+        }
+
+        function executeSample() {
+            document.getElementById('json-input').value = JSON.stringify(SAMPLE_DATA, null, 2);
+            cancelConfirm();
+        }
+
+    </script>
 </body>
 </html>
