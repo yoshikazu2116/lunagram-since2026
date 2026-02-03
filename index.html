@@ -628,6 +628,8 @@
         /* --- 初期入力画面のロジック --- */
         function executeInitialSample() {
             document.getElementById('initial-json-input').value = JSON.stringify(SAMPLE_DATA, null, 2);
+            // 修正：即座に保存して画面遷移させる
+            saveInitialData();
         }
 
         function saveInitialData() {
