@@ -74,7 +74,11 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- 印刷用スタイル (A4縦最適化) --- */
+        /* --- 印刷用スタイル (A4縦 1枚収め最適化) --- */
+        @page {
+            size: A4 portrait;
+            margin: 8mm; /* 余白を狭くする */
+        }
         @media print {
             body {
                 background: white !important;
@@ -82,39 +86,63 @@
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 overflow: visible !important;
+                /* 全体を縮小して1枚に収める荒技 (Chrome/Edge対応) */
+                zoom: 0.75; 
+                /* Firefox等はzoomが効かないためtransformも併用 */
+                transform-origin: top center;
             }
-            /* 背景装飾やボタンを消す */
-            .fixed, button, #top-controls {
+            
+            /* 不要な要素を消す */
+            .fixed, button, #top-controls, footer {
                 display: none !important;
             }
-            /* コンテンツエリアの調整 */
+
+            /* レイアウト調整：余白を極限まで削る */
             #main-content {
                 padding: 0 !important;
-                margin: 0 !important;
+                margin: 0 auto !important;
                 width: 100% !important;
-                max-width: none !important;
+                max-width: 100% !important;
                 transform: none !important;
                 opacity: 1 !important;
             }
-            /* カードのデザインを印刷向けに（枠線のみ、影なし） */
-            .glass-card {
-                background: white !important;
-                border: 1px solid #ccc !important;
-                box-shadow: none !important;
-                backdrop-filter: none !important;
-                page-break-inside: avoid; /* カードの途中で改ページさせない */
-                margin-bottom: 1rem;
-            }
-            /* ヘッダー周り */
+
             header {
                 padding-top: 0 !important;
                 margin-bottom: 1rem !important;
             }
-            /* 強制的に2カラムレイアウトを維持（スマホサイズでも横並びにする） */
+            /* アプリタイトルなどは少し小さく */
+            header h1 {
+                font-size: 1.5rem !important;
+                margin-bottom: 0.25rem !important;
+            }
+            header .text-sm {
+                font-size: 0.75rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+            /* アイコンサイズ調整 */
+            header .w-12 {
+                width: 2rem !important;
+                height: 2rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+            
+            /* 名前表示エリアのパディング縮小 */
+            #header-profile-area .inline-block {
+                padding: 0.5rem 1.5rem !important;
+                margin-bottom: 0.5rem !important;
+                min-height: auto !important;
+                border: 1px solid #ccc !important;
+            }
+            #display-name {
+                font-size: 2rem !important;
+            }
+
+            /* グリッドレイアウトの維持と間隔調整 */
             .grid {
                 display: grid !important;
                 grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-                gap: 1.5rem !important;
+                gap: 1rem !important; /* ギャップを狭く */
             }
             .md\:col-span-4 {
                 grid-column: span 4 / span 4 !important;
@@ -122,17 +150,57 @@
             .md\:col-span-8 {
                 grid-column: span 8 / span 8 !important;
             }
-            /* テキスト色調整 */
+
+            /* カードのデザインを印刷向けに簡素化＆パディング削減 */
+            .glass-card {
+                background: white !important;
+                border: 1px solid #ddd !important;
+                box-shadow: none !important;
+                backdrop-filter: none !important;
+                padding: 1rem !important; /* パディングを減らす */
+                margin-bottom: 0 !important;
+                min-height: auto !important;
+            }
+
+            /* ソウルベースの文字サイズ調整 */
+            #display-soulbase {
+                font-size: 2.5rem !important;
+                line-height: 1 !important;
+            }
+
+            /* 各項目の間隔を詰める */
+            .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+                margin-top: 1rem !important;
+            }
+            .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+                margin-top: 0.5rem !important;
+            }
+
+            /* 運命サイクルのリスト間隔を詰める */
+            #display-cycle .group {
+                padding: 0.25rem 0.5rem !important; /* 上下のパディングを極小に */
+                margin: 0 !important;
+                border: none !important;
+                border-bottom: 1px dashed #eee !important;
+            }
+            #display-cycle .mt-6 {
+                margin-top: 0.5rem !important;
+            }
+            
+            /* 現在地ハイライトのデザイン調整 */
+            .highlight-card {
+                background: #fffbef !important;
+                border: 1px solid #fbbf24 !important;
+                transform: none !important;
+                box-shadow: none !important;
+            }
+
+            /* テキスト色を濃く（視認性向上） */
             .text-white, .text-slate-300, .text-slate-400 {
-                color: #333 !important;
+                color: #444 !important;
             }
             .text-indigo-950, .text-slate-700 {
                 color: black !important;
-            }
-            /* ハイライトの調整 */
-            .highlight-card {
-                background: #fffbef !important; /* 薄い黄色 */
-                border: 2px solid #fbbf24 !important;
             }
         }
     </style>
