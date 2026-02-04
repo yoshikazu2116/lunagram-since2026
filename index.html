@@ -311,12 +311,14 @@
                             <span class="text-slate-400 text-sm font-light">運命数</span>
                             <span id="display-number" class="text-xl font-bold text-indigo-900 print:text-black"></span>
                         </div>
-                        <!-- ★ここが修正箇所：宿命月を追加しました！ -->
+                        
+                        <!-- ★★★ 修正箇所：宿命月エリアを確実に追加 ★★★ -->
                         <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                             <span class="text-slate-400 text-sm font-light">宿命月</span>
                             <span id="display-destiny-moon" class="text-lg text-slate-700 print:text-black font-bold"></span>
                         </div>
-                        <!-- ここまで -->
+                        <!-- ★★★ ここまで ★★★ -->
+
                         <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                             <span class="text-slate-400 text-sm font-light">陰陽五行</span>
                             <span id="display-yingyang" class="text-lg text-slate-700 print:text-black"></span>
@@ -576,8 +578,7 @@
             document.getElementById('display-number').textContent = profileData["運命数"] || "-";
             document.getElementById('display-yingyang').textContent = profileData["陰陽五行"] || "-";
             document.getElementById('display-moon').textContent = profileData["運命月"] || "-";
-            
-            // ★修正箇所：宿命月のデータを正しく反映
+            // ★★★ 修正箇所：データを流し込む処理も追加 ★★★
             document.getElementById('display-destiny-moon').textContent = profileData["宿命月"] || "-";
             
             // カラー（テキストのみ表示）
