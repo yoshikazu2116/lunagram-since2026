@@ -87,7 +87,7 @@
                 print-color-adjust: exact !important;
                 overflow: visible !important;
                 
-                /* ★ここがポイント：全体を75%に縮小してバランス調整 */
+                /* 全体を75%に縮小してバランス調整 */
                 zoom: 0.75 !important; 
                 
                 width: 100% !important;
@@ -111,23 +111,27 @@
 
             header {
                 padding-top: 10px !important;
-                margin-bottom: 20px !important;
+                margin-bottom: 10px !important; /* 少し詰める */
             }
             
             /* ヘッダー周りの装飾を印刷用に簡素化 */
-            header .absolute { display: none !important; } /* 背景の光などを消す */
+            header .absolute { display: none !important; }
             
             /* グリッドレイアウトの維持 */
             .grid {
                 display: grid !important;
                 grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-                gap: 1.5rem !important;
+                gap: 1rem !important; /* ギャップを狭く */
             }
             .md\:col-span-4 {
                 grid-column: span 4 / span 4 !important;
             }
             .md\:col-span-8 {
                 grid-column: span 8 / span 8 !important;
+            }
+            /* 追加：相談内容エリアは全幅 */
+            .md\:col-span-12 {
+                grid-column: span 12 / span 12 !important;
             }
 
             /* カードのデザインを印刷向けに簡素化 */
@@ -136,19 +140,19 @@
                 border: 1px solid #ccc !important;
                 box-shadow: none !important;
                 backdrop-filter: none !important;
-                padding: 1.5rem !important;
+                padding: 1rem !important; /* パディングを少し減らす */
                 margin-bottom: 0 !important;
                 page-break-inside: avoid;
             }
 
             /* 運命サイクルのリスト間隔を詰める */
             #display-cycle .group {
-                padding-top: 0.25rem !important;
-                padding-bottom: 0.25rem !important;
+                padding-top: 0.15rem !important;
+                padding-bottom: 0.15rem !important;
                 border-bottom: 1px dashed #eee !important;
             }
             #display-cycle .mt-6 {
-                margin-top: 0.5rem !important;
+                margin-top: 0.25rem !important;
             }
             
             /* 現在地ハイライトのデザイン調整 */
@@ -156,6 +160,17 @@
                 background: #fffbef !important;
                 border: 2px solid #fbbf24 !important;
                 box-shadow: none !important;
+            }
+
+            /* 相談内容リストの調整 */
+            .consultation-list {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important; /* 2列にする */
+                gap: 0.5rem !important;
+                font-size: 0.8rem !important; /* 少し小さくして収める */
+            }
+            .consultation-item {
+                margin-bottom: 0.25rem !important;
             }
 
             /* 文字色を真っ黒に（視認性向上） */
@@ -325,14 +340,12 @@
                         <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                             <span class="text-slate-400 text-sm font-light">運命月</span>
                             <span class="flex items-center gap-2 text-lg text-slate-700 print:text-black">
-                                <!-- アイコン削除済み、テキストのみ表示 -->
                                 <span id="display-moon"></span>
                             </span>
                         </div>
                         <div class="flex justify-between items-center pt-1">
                             <span class="text-slate-400 text-sm font-light">ラッキーカラー</span>
                             <div class="flex items-center gap-2">
-                                <!-- カラー丸削除済み、テキストのみ表示 -->
                                 <span id="display-color" class="text-slate-700 print:text-black"></span>
                             </div>
                         </div>
@@ -391,6 +404,82 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ★新規追加：悩みごと・相談内容（全幅） -->
+            <div class="md:col-span-12">
+                <div class="glass-card rounded-2xl p-6 transition-all duration-300">
+                    <h3 class="text-sm md:text-base font-bold text-slate-700 mb-3 flex items-center gap-2 border-b border-slate-200/50 pb-2">
+                        【 悩みごとや相談内容 】
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-xs md:text-sm consultation-list">
+                        <!-- 1. 人間関係 -->
+                        <div class="consultation-item">
+                            <div class="font-bold text-indigo-900 mb-1">◻︎人間関係の悩み</div>
+                            <div class="text-slate-600 pl-4 leading-relaxed">
+                                ▪︎トーク力の向上　▪︎自己表現の向上　▪︎社交的生の向上　▪︎親友が欲しい
+                            </div>
+                        </div>
+                        <!-- 2. 仕事 -->
+                        <div class="consultation-item">
+                            <div class="font-bold text-indigo-900 mb-1">◻︎仕事の悩み</div>
+                            <div class="text-slate-600 pl-4 leading-relaxed">
+                                ▪︎仕事への愛着　▪︎業務効率化　▪︎出世・昇進　▪︎方向性の模索　▪︎適性・適職・独立
+                            </div>
+                        </div>
+                        <!-- 3. お金 -->
+                        <div class="consultation-item">
+                            <div class="font-bold text-indigo-900 mb-1">◻︎お金の悩み</div>
+                            <div class="text-slate-600 pl-4 leading-relaxed">
+                                ▪︎金運を良くしたい　▪︎お金を貯めれない　▪︎ギャンブル好き　▪︎相続など
+                            </div>
+                        </div>
+                        <!-- 4. 夢 -->
+                        <div class="consultation-item">
+                            <div class="font-bold text-indigo-900 mb-1">◻︎夢</div>
+                            <div class="text-slate-600 pl-4 leading-relaxed">
+                                ▪︎気持ちが続かない　▪︎どんな夢を持てばいいのか知りたい　▪︎実現のため行動計画
+                            </div>
+                        </div>
+                        <!-- 5. 恋愛・結婚 -->
+                        <div class="consultation-item">
+                            <div class="font-bold text-indigo-900 mb-1">◻︎恋愛・結婚</div>
+                            <div class="text-slate-600 pl-4 leading-relaxed">
+                                ▪︎愛を育みたい　▪︎どんな相手を選らべば？　▪︎パートナーとの相性　▪︎婚期を知りたい
+                            </div>
+                        </div>
+                        <!-- 6. 自己プロデュース -->
+                        <div class="consultation-item">
+                            <div class="font-bold text-indigo-900 mb-1">◻︎自己プロデュース</div>
+                            <div class="text-slate-600 pl-4 leading-relaxed">
+                                ▪︎プラス思考　▪︎チャレンジ精神
+                            </div>
+                        </div>
+                        <!-- 7. 健康 -->
+                        <div class="consultation-item">
+                            <div class="font-bold text-indigo-900 mb-1">◻︎健康の悩み</div>
+                            <div class="text-slate-600 pl-4 leading-relaxed">
+                                ▪︎体力不足　▪︎疲れやすい　▪︎身体の弱点　▪︎心労　▪︎冷性　▪︎便秘　▪︎むくみ　▪︎生理不順　▪︎不眠
+                            </div>
+                        </div>
+                        <!-- 8. 美 -->
+                        <div class="consultation-item">
+                            <div class="font-bold text-indigo-900 mb-1">◻︎美の悩み</div>
+                            <div class="text-slate-600 pl-4 leading-relaxed">
+                                ▪︎痩せたい(ダイエット)　▪︎美肌　▪︎シミしわ　▪︎乾燥肌　▪︎敏感肌　▪︎メイク術
+                            </div>
+                        </div>
+                        <!-- 9. その他 -->
+                        <div class="consultation-item">
+                            <div class="font-bold text-indigo-900 mb-1">◻︎その他</div>
+                            <div class="text-slate-600 pl-4 leading-relaxed">
+                                ▪︎イライラ　▪︎憂鬱　▪︎不安　▪︎マイナス思考　▪︎キレやすい
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <footer class="mt-16 pb-8 text-center text-slate-400 text-xs flex flex-col items-center gap-2">
