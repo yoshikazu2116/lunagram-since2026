@@ -74,10 +74,10 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- 印刷用スタイル (A4縦 1枚収め最適化) --- */
+        /* --- 印刷用スタイル (A4縦 1枚収め最適化・超強力版) --- */
         @page {
             size: A4 portrait;
-            margin: 8mm; /* 余白を狭くする */
+            margin: 5mm; /* 余白を極小に */
         }
         @media print {
             body {
@@ -86,10 +86,12 @@
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 overflow: visible !important;
-                /* 全体を縮小して1枚に収める荒技 (Chrome/Edge対応) */
-                zoom: 0.75; 
-                /* Firefox等はzoomが効かないためtransformも併用 */
-                transform-origin: top center;
+                
+                /* ★ここがポイント：全体を60%に縮小して強制的に1枚に収める */
+                zoom: 0.60 !important; 
+                
+                width: 100% !important;
+                height: 100% !important;
             }
             
             /* 不要な要素を消す */
@@ -97,7 +99,7 @@
                 display: none !important;
             }
 
-            /* レイアウト調整：余白を極限まで削る */
+            /* レイアウト調整 */
             #main-content {
                 padding: 0 !important;
                 margin: 0 auto !important;
@@ -108,41 +110,18 @@
             }
 
             header {
-                padding-top: 0 !important;
-                margin-bottom: 1rem !important;
-            }
-            /* アプリタイトルなどは少し小さく */
-            header h1 {
-                font-size: 1.5rem !important;
-                margin-bottom: 0.25rem !important;
-            }
-            header .text-sm {
-                font-size: 0.75rem !important;
-                margin-bottom: 0.5rem !important;
-            }
-            /* アイコンサイズ調整 */
-            header .w-12 {
-                width: 2rem !important;
-                height: 2rem !important;
-                margin-bottom: 0.5rem !important;
+                padding-top: 10px !important;
+                margin-bottom: 20px !important;
             }
             
-            /* 名前表示エリアのパディング縮小 */
-            #header-profile-area .inline-block {
-                padding: 0.5rem 1.5rem !important;
-                margin-bottom: 0.5rem !important;
-                min-height: auto !important;
-                border: 1px solid #ccc !important;
-            }
-            #display-name {
-                font-size: 2rem !important;
-            }
-
-            /* グリッドレイアウトの維持と間隔調整 */
+            /* ヘッダー周りの装飾を印刷用に簡素化 */
+            header .absolute { display: none !important; } /* 背景の光などを消す */
+            
+            /* グリッドレイアウトの維持 */
             .grid {
                 display: grid !important;
                 grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-                gap: 1rem !important; /* ギャップを狭く */
+                gap: 1.5rem !important;
             }
             .md\:col-span-4 {
                 grid-column: span 4 / span 4 !important;
@@ -151,36 +130,21 @@
                 grid-column: span 8 / span 8 !important;
             }
 
-            /* カードのデザインを印刷向けに簡素化＆パディング削減 */
+            /* カードのデザインを印刷向けに簡素化 */
             .glass-card {
                 background: white !important;
-                border: 1px solid #ddd !important;
+                border: 1px solid #ccc !important;
                 box-shadow: none !important;
                 backdrop-filter: none !important;
-                padding: 1rem !important; /* パディングを減らす */
+                padding: 1.5rem !important;
                 margin-bottom: 0 !important;
-                min-height: auto !important;
-            }
-
-            /* ソウルベースの文字サイズ調整 */
-            #display-soulbase {
-                font-size: 2.5rem !important;
-                line-height: 1 !important;
-            }
-
-            /* 各項目の間隔を詰める */
-            .space-y-6 > :not([hidden]) ~ :not([hidden]) {
-                margin-top: 1rem !important;
-            }
-            .space-y-4 > :not([hidden]) ~ :not([hidden]) {
-                margin-top: 0.5rem !important;
+                page-break-inside: avoid;
             }
 
             /* 運命サイクルのリスト間隔を詰める */
             #display-cycle .group {
-                padding: 0.25rem 0.5rem !important; /* 上下のパディングを極小に */
-                margin: 0 !important;
-                border: none !important;
+                padding-top: 0.25rem !important;
+                padding-bottom: 0.25rem !important;
                 border-bottom: 1px dashed #eee !important;
             }
             #display-cycle .mt-6 {
@@ -190,16 +154,15 @@
             /* 現在地ハイライトのデザイン調整 */
             .highlight-card {
                 background: #fffbef !important;
-                border: 1px solid #fbbf24 !important;
-                transform: none !important;
+                border: 2px solid #fbbf24 !important;
                 box-shadow: none !important;
             }
 
-            /* テキスト色を濃く（視認性向上） */
-            .text-white, .text-slate-300, .text-slate-400 {
-                color: #444 !important;
+            /* 文字色を真っ黒に（視認性向上） */
+            .text-white, .text-slate-300, .text-slate-400, .text-indigo-400, .text-slate-500 {
+                color: #333 !important;
             }
-            .text-indigo-950, .text-slate-700 {
+            .text-indigo-950, .text-slate-700, .font-bold {
                 color: black !important;
             }
         }
@@ -348,11 +311,12 @@
                             <span class="text-slate-400 text-sm font-light">運命数</span>
                             <span id="display-number" class="text-xl font-bold text-indigo-900 print:text-black"></span>
                         </div>
-                        <!-- 新規追加：宿命月 -->
+                        <!-- ★ここが修正箇所：宿命月を追加しました！ -->
                         <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                             <span class="text-slate-400 text-sm font-light">宿命月</span>
                             <span id="display-destiny-moon" class="text-lg text-slate-700 print:text-black font-bold"></span>
                         </div>
+                        <!-- ここまで -->
                         <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                             <span class="text-slate-400 text-sm font-light">陰陽五行</span>
                             <span id="display-yingyang" class="text-lg text-slate-700 print:text-black"></span>
@@ -360,14 +324,12 @@
                         <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                             <span class="text-slate-400 text-sm font-light">運命月</span>
                             <span class="flex items-center gap-2 text-lg text-slate-700 print:text-black">
-                                <!-- アイコン削除済み、テキストのみ表示 -->
                                 <span id="display-moon"></span>
                             </span>
                         </div>
                         <div class="flex justify-between items-center pt-1">
                             <span class="text-slate-400 text-sm font-light">ラッキーカラー</span>
                             <div class="flex items-center gap-2">
-                                <!-- カラー丸削除済み、テキストのみ表示 -->
                                 <span id="display-color" class="text-slate-700 print:text-black"></span>
                             </div>
                         </div>
@@ -614,7 +576,8 @@
             document.getElementById('display-number').textContent = profileData["運命数"] || "-";
             document.getElementById('display-yingyang').textContent = profileData["陰陽五行"] || "-";
             document.getElementById('display-moon').textContent = profileData["運命月"] || "-";
-            // 新規追加：宿命月
+            
+            // ★修正箇所：宿命月のデータを正しく反映
             document.getElementById('display-destiny-moon').textContent = profileData["宿命月"] || "-";
             
             // カラー（テキストのみ表示）
