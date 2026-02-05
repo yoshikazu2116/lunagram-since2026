@@ -506,7 +506,7 @@
             return (!data["名前"] && (!data["運命サイクル"] || data["運命サイクル"].length === 0));
         }
 
-        // ★修正済みv4.2：全角/半角/Lenticularすべての括弧に対応
+        // ★修正済みv4.3：全角/半角/Lenticular対応＋現在地マークの強力クリーニング
         function parseCycleItem(itemStr) {
             // データが空の場合の安全策
             if (!itemStr) return { year: "", phase: "", keyword: "", isCurrent: false };
@@ -535,9 +535,13 @@
                 // 見つかったフェーズ（括弧）より「後ろ」にある文字列をすべて取得
                 const afterPhase = itemStr.substring(phaseMatch.index + phaseMatch[0].length);
                 
-                // 「（★現在地）」や「(*現在地)」などのマーク部分を削除
-                // 正規表現で、括弧の種類や星の種類に関わらず除去するように設定
-                keyword = afterPhase.replace(/[\(（]?[★\*].*?[\)）]?/g, "").trim();
+                // 【重要修正 v4.3】
+                // 「現在地」という文字が含まれていれば、前後のカッコや記号ごと強力に削除する
+                // 例: 「（★現在地）」、「(現在地)」、「現在地）」、「 現在地」などを全て消去
+                keyword = afterPhase.replace(/[\(（\[［]?\s*[★\*]?\s*現在地\s*[\]］\)）]?/g, "").trim();
+                
+                // 念のため、従来の「★...」パターンも削除（現在地以外の文言が入る可能性へのバックアップ）
+                keyword = keyword.replace(/[\(（]?[★\*].*?[\)）]?/g, "").trim();
                 
                 // 万が一、末尾にカンマなどが残っていたら削除
                 keyword = keyword.replace(/[,，]$/, "");
