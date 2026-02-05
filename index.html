@@ -506,14 +506,14 @@
             return (!data["名前"] && (!data["運命サイクル"] || data["運命サイクル"].length === 0));
         }
 
-        // ★修正済みv4.3：全角/半角/Lenticular対応＋現在地マークの強力クリーニング
+        // ★修正済みv4.4：全角/半角/Lenticular対応＋現在地マークの強力クリーニング(☆対応版)
         function parseCycleItem(itemStr) {
             // データが空の場合の安全策
             if (!itemStr) return { year: "", phase: "", keyword: "", isCurrent: false };
             
             // 1. "現在地"マークの判定
-            // 「★」でも「*」でも「現在地」という文字が含まれていればOKとする柔軟な判定
-            const isCurrent = itemStr.includes("★") || itemStr.includes("*") || itemStr.includes("現在地");
+            // 「★」でも「*」でも「☆」でも「現在地」という文字が含まれていればOKとする柔軟な判定
+            const isCurrent = itemStr.includes("★") || itemStr.includes("*") || itemStr.includes("☆") || itemStr.includes("現在地");
             
             // 2. 年の抽出
             // 行の先頭にある「数字+年」を取得
@@ -535,16 +535,16 @@
                 // 見つかったフェーズ（括弧）より「後ろ」にある文字列をすべて取得
                 const afterPhase = itemStr.substring(phaseMatch.index + phaseMatch[0].length);
                 
-                // 【重要修正 v4.3】
-                // 「現在地」という文字が含まれていれば、前後のカッコや記号ごと強力に削除する
-                // 例: 「（★現在地）」、「(現在地)」、「現在地）」、「 現在地」などを全て消去
-                keyword = afterPhase.replace(/[\(（\[［]?\s*[★\*]?\s*現在地\s*[\]］\)）]?/g, "").trim();
+                // 【重要修正 v4.4】
+                // 1. 「現在地」という文字が含まれていれば、前後のカッコや記号(★*☆)ごと強力に削除する
+                //    例: 「（★現在地）」、「(現在地)」、「現在地）」、「☆現在地」などを全て消去
+                let cleanText = afterPhase.replace(/[\(（\[［]?\s*[★\*☆]?\s*現在地\s*[\]］\)）]?/g, "");
                 
-                // 念のため、従来の「★...」パターンも削除（現在地以外の文言が入る可能性へのバックアップ）
-                keyword = keyword.replace(/[\(（]?[★\*].*?[\)）]?/g, "").trim();
-                
+                // 2. 「現在地」の文字がなくても、残っている「(★...)」や「(*...)」や「(☆...)」パターンも念のため削除
+                cleanText = cleanText.replace(/[\(（\[［]?\s*[★\*☆].*?[\)）\]］]?/g, "");
+
                 // 万が一、末尾にカンマなどが残っていたら削除
-                keyword = keyword.replace(/[,，]$/, "");
+                keyword = cleanText.trim().replace(/[,，]$/, "");
             }
 
             return { year, phase, keyword, isCurrent };
