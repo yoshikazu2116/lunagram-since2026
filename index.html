@@ -506,7 +506,7 @@
             return (!data["名前"] && (!data["運命サイクル"] || data["運命サイクル"].length === 0));
         }
 
-        // ★修正済みv4.4：全角/半角/Lenticular対応＋現在地マークの強力クリーニング(☆対応版)
+        // ★修正済みv4.5：全角/半角/Lenticular対応＋現在地マークの強力クリーニング(完全版)
         function parseCycleItem(itemStr) {
             // データが空の場合の安全策
             if (!itemStr) return { year: "", phase: "", keyword: "", isCurrent: false };
@@ -535,13 +535,17 @@
                 // 見つかったフェーズ（括弧）より「後ろ」にある文字列をすべて取得
                 const afterPhase = itemStr.substring(phaseMatch.index + phaseMatch[0].length);
                 
-                // 【重要修正 v4.4】
+                // 【重要修正 v4.5】
                 // 1. 「現在地」という文字が含まれていれば、前後のカッコや記号(★*☆)ごと強力に削除する
                 //    例: 「（★現在地）」、「(現在地)」、「現在地）」、「☆現在地」などを全て消去
                 let cleanText = afterPhase.replace(/[\(（\[［]?\s*[★\*☆]?\s*現在地\s*[\]］\)）]?/g, "");
                 
                 // 2. 「現在地」の文字がなくても、残っている「(★...)」や「(*...)」や「(☆...)」パターンも念のため削除
                 cleanText = cleanText.replace(/[\(（\[［]?\s*[★\*☆].*?[\)）\]］]?/g, "");
+                
+                // 3. さらに念のため、キーワード欄に残ってしまった単独の「★」「☆」「*」や「（」「）」も削除する（キーワードの美化）
+                // ※キーワードに「（」などの記号が含まれることは稀なため、表示崩れを防ぐために削除
+                cleanText = cleanText.replace(/[★☆＊*（\(\)）\[\]［］]/g, "");
 
                 // 万が一、末尾にカンマなどが残っていたら削除
                 keyword = cleanText.trim().replace(/[,，]$/, "");
